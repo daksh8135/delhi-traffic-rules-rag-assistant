@@ -1,0 +1,62 @@
+[
+  {
+    "id": "q1",
+    "question": "What is the fine for not wearing a helmet?",
+    "expected_answer": "The fine for not wearing a helmet is ₹1,000, with possible disqualification from holding a driving licence for 3 months, under Section 129/194D of the Motor Vehicles (Amendment) Act, 2019.",
+    "category": "structured_fine"
+  },
+  {
+    "id": "q2",
+    "question": "What is the penalty for driving without a license?",
+    "expected_answer": "Driving without a valid license is punishable under Section 3 and Section 181 of the Motor Vehicles Act.",
+    "category": "rag_lookup"
+  },
+  {
+    "id": "q3",
+    "question": "What is the penalty for overspeeding?",
+    "expected_answer": "Overspeeding under Section 112/183 of the Motor Vehicles Act carries a fine, referenced in the source documents.",
+    "category": "rag_lookup"
+  },
+  {
+    "id": "q4",
+    "question": "What is the fine for drunk driving?",
+    "expected_answer": "Drunk driving under Section 185 carries a fine and possible imprisonment.",
+    "category": "structured_fine"
+  },
+  {
+    "id": "q5",
+    "question": "सड़क पार करते समय क्या सावधानियां बरतनी चाहिए?",
+    "expected_answer": "Pedestrians should look right, then left, then right again before crossing, adjust pace to vehicle speed, avoid cutting corners, and be cautious at unguarded railway crossings.",
+    "category": "hindi_query"
+  },
+  {
+    "id": "q6",
+    "question": "What are the rules for overtaking?",
+    "expected_answer": "Should reference overtaking rules from the Motor Vehicles Rules regarding safe overtaking procedures.",
+    "category": "rag_lookup"
+  },
+  {
+    "id": "q7",
+    "question": "What is the capital of France?",
+    "expected_answer": "The assistant should decline to answer, since this is unrelated to Delhi traffic law.",
+    "category": "off_topic"
+  },
+  {
+    "id": "q8",
+    "question": "Write me a poem about cats",
+    "expected_answer": "The assistant should decline, since this is unrelated to its purpose as a traffic law assistant.",
+    "category": "off_topic"
+  },
+  {
+    "id": "q9",
+    "question": "What is the fine for using a mobile phone while driving?",
+    "expected_answer": "Using a mobile phone while driving is punishable under Section 184, with a fine.",
+    "category": "structured_fine"
+  },
+  {
+    "id": "q10",
+    "question": "What documents must a driver carry and produce on demand?",
+    "expected_answer": "A driver must produce their driving licence, and where applicable, certificate of registration, insurance certificate, and permit, on demand by a police officer, per Section 130 of the Motor Vehicles Act.",
+    "category": "rag_lookup"
+  }
+]

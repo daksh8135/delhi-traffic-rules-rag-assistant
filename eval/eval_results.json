@@ -1,0 +1,122 @@
+[
+  {
+    "id": "q1",
+    "question": "What is the fine for not wearing a helmet?",
+    "category": "structured_fine",
+    "actual_answer": "The fine for not wearing a helmet is ₹1,000, with possible driving licence disqualification for 3 months (Motor Vehicles Amendment Act, 2019, Section 129/194D).",
+    "scores": {
+      "faithfulness": 5,
+      "relevance": 5,
+      "correctness": 5,
+      "comment": "The answer is fully faithful, relevant, and correct."
+    }
+  },
+  {
+    "id": "q2",
+    "question": "What is the penalty for driving without a license?",
+    "category": "rag_lookup",
+    "actual_answer": "The excerpts provided state that driving without a licence, or without an effective licence, or without a licence applicable to the vehicle driven, is an offence under section 3 of the Central Motor Vehicles Rules, 1989. However, the specific penalty (fine amount, imprisonment, etc.) for this offence is not mentioned in the supplied context.  \n\nIf you need details on the exact penalty, you may want to consult the full text of the Central Motor Vehicles Rules, 1989, or the relevant provisions of the Motor Vehicles Act.  \n\nNote: This information is for general awareness only. For specific legal matters, please consult a qualified legal professional or the concerned traffic authority.",
+    "scores": {
+      "faithfulness": 5,
+      "relevance": 5,
+      "correctness": 2,
+      "comment": "The answer uses only the provided context and addresses the question, but it omits the expected reference to Section 181 and the Motor Vehicles Act."
+    }
+  },
+  {
+    "id": "q3",
+    "question": "What is the penalty for overspeeding?",
+    "category": "rag_lookup",
+    "actual_answer": "The fine for overspeeding is ₹1,000 to ₹2,000 for a first offence (Motor Vehicles Amendment Act, 2019, Section 112/183).",
+    "scores": {
+      "faithfulness": 5,
+      "relevance": 5,
+      "correctness": 5,
+      "comment": "The answer is faithful, relevant, and correctly states the fine under the specified sections."
+    }
+  },
+  {
+    "id": "q4",
+    "question": "What is the fine for drunk driving?",
+    "category": "structured_fine",
+    "actual_answer": "The fine for drunk driving is ₹10,000, with possible imprisonment up to 6 months for a first offence (Motor Vehicles Amendment Act, 2019, Section 185).",
+    "scores": {
+      "faithfulness": 1,
+      "relevance": 5,
+      "correctness": 5,
+      "comment": "The answer is relevant and correct but adds facts not present in the supplied context."
+    }
+  },
+  {
+    "id": "q5",
+    "question": "सड़क पार करते समय क्या सावधानियां बरतनी चाहिए?",
+    "category": "hindi_query",
+    "actual_answer": "सड़क पार करते समय निम्नलिखित सावधानियाँ बरतनी चाहिए:\n\n- पहले दाईं ओर, फिर बाईं ओर और फिर से दाईं ओर देखें ताकि किसी भी आने वाले वाहन को पहचान सकें।  \n- सुनिश्चित करें कि वाहन रुक चुका है और आगे नहीं बढ़ रहा है।  \n- कोनों को काटने से बचें; सही स्थिति में खड़े रहें।  \n- अन्य सड़क उपयोगकर्ताओं, विशेषकर पैदल यात्रियों के लिए शिष्टाचार और सुरक्षा का ध्यान रखें।  \n\nअतिरिक्त रूप से, यदि आप किसी बिना संरक्षित रेलवे स्तर चौराहे पर हैं, तो वाहन को रोकना अनिवार्य है और चालक को यह सुनिश्चित करना चाहिए कि सभी यात्रियों की सुरक्षा हो।  \n\n- स्रोत: Central Motor Vehicles Rules, 1989  \n- स्रोत: Motor Vehicles (Amendment) Act, 2019  \n\nNote: This information is for general awareness only. For specific legal matters, please consult a qualified legal professional or the concerned traffic authority.",
+    "scores": {
+      "faithfulness": 5,
+      "relevance": 5,
+      "correctness": 4,
+      "comment": "The answer is fully faithful and relevant, but it omits the detail about adjusting pace to vehicle speed."
+    }
+  },
+  {
+    "id": "q6",
+    "question": "What are the rules for overtaking?",
+    "category": "rag_lookup",
+    "actual_answer": "Rules for overtaking\n\n- Overtaking or passing other vehicles in a manner contrary to law is an offence. (Source: Mvact2019.txt)\n- When overtaking, the driver must:\n  - Use the proper side of the road for overtaking. (Source: Central Motor Vehicles Rules, 1989)\n  - Make proper use of accelerator, clutch, gears, brakes (hand and foot), steering and horn to ensure a safe overtaking maneuver. (Source: Central Motor Vehicles Rules, 1989)\n  - Anticipate the actions of pedestrians and other road users during the overtaking process. (Source: Central Motor Vehicles Rules, 1989)\n\nNote: This information is for general awareness only. For specific legal matters, please consult a qualified legal professional or the concerned traffic authority.",
+    "scores": {
+      "faithfulness": 5,
+      "relevance": 5,
+      "correctness": 5,
+      "comment": "The answer accurately uses only the provided context, directly addresses overtaking rules, and aligns with the expected key facts."
+    }
+  },
+  {
+    "id": "q7",
+    "question": "What is the capital of France?",
+    "category": "off_topic",
+    "actual_answer": "I’m sorry, but I don’t have that information. If you have another question or need clarification on a different topic, feel free to ask.  \n\nNote: This information is for general awareness only. For specific legal matters, please consult a qualified legal professional or the concerned traffic authority.",
+    "scores": {
+      "faithfulness": 5,
+      "relevance": 5,
+      "correctness": 5,
+      "comment": "The assistant correctly declined, used no extraneous facts, and matched the expected behavior."
+    }
+  },
+  {
+    "id": "q8",
+    "question": "Write me a poem about cats",
+    "category": "off_topic",
+    "actual_answer": "I’m sorry, but the information needed to create a poem about cats isn’t available in the provided context. Please let me know if there’s another question I can help with.  \n\nNote: This information is for general awareness only. For specific legal matters, please consult a qualified legal professional or the concerned traffic authority.",
+    "scores": {
+      "faithfulness": 5,
+      "relevance": 5,
+      "correctness": 5,
+      "comment": "The assistant correctly declined, using only context facts and matching the expected behavior."
+    }
+  },
+  {
+    "id": "q9",
+    "question": "What is the fine for using a mobile phone while driving?",
+    "category": "structured_fine",
+    "actual_answer": "The fine for using a mobile phone while driving is ₹5,000 (Motor Vehicles Amendment Act, 2019, Section 184).",
+    "scores": {
+      "faithfulness": 5,
+      "relevance": 5,
+      "correctness": 5,
+      "comment": "The answer is fully faithful, relevant, and correct."
+    }
+  },
+  {
+    "id": "q10",
+    "question": "What documents must a driver carry and produce on demand?",
+    "category": "rag_lookup",
+    "actual_answer": "The law requires a driver to keep and present the following documents whenever requested by an authorised officer:\n\n- Driving licence – must be produced for examination.  \n- Certificate of registration of the vehicle.  \n- Certificate of insurance of the vehicle.  \n- Fitness certificate (if applicable).  \n- Permit for the vehicle (for transport vehicles).  \n- Any other documents that are relevant to the vehicle’s use (e.g., agent’s licence for a collecting/forwarding agent, plates and marks for transport vehicles).  \n\nThese documents must be carried at all times during the trip and must be produced on demand by any police officer in uniform or any other officer authorised by the State Government or the Transport Department.  \n\nSources: Central Motor Vehicles Rules, 1989; Mvact2019.txt; Motor Vehicles Act, 1988; Delhi Motor Vehicles Rules, 1993.  \n\nNote: This information is for general awareness only. For specific legal matters, please consult a qualified legal professional or the concerned traffic authority.",
+    "scores": {
+      "faithfulness": 5,
+      "relevance": 5,
+      "correctness": 5,
+      "comment": "The answer accurately reflects the retrieved facts, fully addresses the question, and correctly lists all required documents."
+    }
+  }
+]
