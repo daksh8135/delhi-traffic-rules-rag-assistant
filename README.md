@@ -262,3 +262,4 @@ This project is for educational and portfolio purposes. Information provided by 
 **Maintainer:** _[Daksh Bains]_
 - **Email:** _[dakshbains05@gmail.com]_
 - **GitHub:** [@daksh8135](https://github.com/daksh8135)
+**Live demo:** [https://delhi-traffic-rules-rag-assistant-dbwuaqjm4arqjhnflatyk9.streamlit.app/](https://delhi-traffic-rules-rag-assistant-dbwuaqjm4arqjhnflatyk9.streamlit.app/)
