@@ -7,3 +7,4 @@ langchain-community>=0.3.25
 langchain-groq>=0.3.2
 sentence-transformers>=4.1.0
 uvicorn>=0.34.3
+rank_bm25
