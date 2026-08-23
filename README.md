@@ -1,246 +1,264 @@
-# Traffic Rules Assistant (Tamil Nadu RAG Chatbot)
+# 🚦 Delhi Traffic Rules Assistant
 
-An AI-powered assistant built using Retrieval-Augmented Generation (RAG) that provides context-aware answers about Tamil Nadu traffic rules, penalties, and driver rights. It combines semantic search with LLMs for accurate, explainable, and trustworthy responses.
+An AI-powered assistant built using hybrid Retrieval-Augmented Generation (RAG) that provides context-aware, cited answers about Delhi traffic rules, penalties, and driver rights. It combines dense semantic search with sparse keyword search and LLM generation for accurate, explainable, and trustworthy responses — with built-in evaluation to measure that trustworthiness, not just claim it.
+
+**Live demo:** _[add your Streamlit Cloud link here once deployed]_
 
 ---
-![Alt text](https://github.com/madhans476/repo-image/blob/main/traffic_rules_assistant/Screenshot%202025-06-13%20163336.png)
-![Alt text](https://github.com/madhans476/repo-image/blob/main/traffic_rules_assistant/Screenshot%202025-06-13%20163402.png)
 
 ## Repo Structure
 ```plaintext
 traffic_rules_assistant/
-├── .venv/          
+├── .venv/
 ├── data/
-|   ├── processed/
-|   |    ├── faiss_index.idx
-|   |    ├── TN_traffic_rules.json
-|   |    └── TN_traffic_rules.txt
-|   └──  TN Traffic rules.pdf
+│   ├── raw/                          # source PDFs
+│   ├── processed/                    # extracted text, chunks, FAISS + BM25 indexes
+│   └── fines_lookup.json             # structured lookup table for known fines
+├── eval/
+│   ├── eval_dataset.json             # hand-curated test questions
+│   └── eval_results.json             # latest evaluation run output
 ├── src/
-│   ├── chunking.py 
-│   ├── embedding.py 
-│   ├── generator.py
-│   ├── retriever.py
-│   ├── main.py
-│   └── text_extraction.py 
+│   ├── text_extraction.py            # PDF -> text (multi-document support)
+│   ├── chunking.py                   # merges all sources into one chunk set
+│   ├── embedding.py                  # builds FAISS dense index
+│   ├── sparse_retriever.py           # builds BM25 sparse index
+│   ├── retriever.py                  # dense retrieval
+│   ├── hybrid_retriever.py           # dense + sparse fused via RRF
+│   ├── fine_lookup.py                # deterministic fine lookup
+│   ├── generator.py                  # grounded generation, citations, guardrails
+│   ├── eval_runner.py                # LLM-as-judge evaluation harness
+│   └── main.py                       # CLI chatbot
 ├── api/
-│   └──  app.py
-├── frontend/ 
-│   └── index.html  
+│   └── app.py                        # Streamlit web interface
 ├── .gitignore
-├── .python-version
+├── .env                              # GROQ_API_KEY (not committed)
 ├── README.md
-├── requirements.txt
-└── pyproject.toml
+└── requirements.txt
 ```
+
+---
 
 ## Overview
 
-This project extracts legal content from a government-issued traffic PDF and makes it queryable via natural language questions using a custom-built RAG pipeline. It uses:
+This project ingests multiple official Delhi and central Motor Vehicle legal documents and makes them queryable through natural language, using a hybrid RAG pipeline built and debugged from the ground up. It uses:
 
-* `sentence-transformers` for generating document embeddings
-* `FAISS` for fast semantic retrieval
-* `LangChain` with `Groq` LLM backend for fast and accurate response generation
-* `FastAPI` to expose the system as an API
-
-The assistant is designed to provide concise, legally grounded, and verifiable answers.
+- `sentence-transformers` + `FAISS` for semantic retrieval
+- `rank_bm25` for keyword-based retrieval, fused with dense search via Reciprocal Rank Fusion
+- `LangChain` with `Groq` LLM backend for grounded, cited response generation
+- A structured lookup table for guaranteed-consistent answers on high-frequency fine queries
+- A custom LLM-as-judge evaluation harness to measure — not assume — answer quality
+- `Streamlit` to expose the system as a usable web interface
 
 ---
 
 ## Target Audience
 
-* Citizens of Tamil Nadu
-* Driving school instructors and trainees
-* Traffic law educators
-* AI/ML enthusiasts learning about RAG pipelines
+- Citizens navigating Delhi traffic law
+- Driving school instructors and trainees
+- Traffic law educators
+- AI/ML learners studying practical RAG system design and evaluation
 
 ---
 
 ## Prerequisites
 
-* Python 3.11+
-* Basic terminal/CLI knowledge
-* Internet access for LLM API (Groq)
-* Groq API key (free tier available)
+- Python 3.11+
+- Basic terminal/CLI knowledge
+- Internet access for LLM API (Groq)
+- Groq API key (free tier available at [console.groq.com](https://console.groq.com))
 
 ---
 
 ## Installation
 
 ```bash
-# Clone the repository
-https://github.com/madhans476/traffic_rules_assistant.git
-
+git clone <your-repo-url>
 cd traffic_rules_assistant
 
-# Create environment
-uv venv .venv
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+python -m venv .venv
+.venv\Scripts\Activate.ps1      # Windows
+# source .venv/bin/activate     # macOS/Linux
 
-# Install dependencies
-uv pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ---
 
 ## Environment Setup
 
-### `.env` file (create at root):
-
+Create a `.env` file at the project root:
 ```
 GROQ_API_KEY=your-groq-api-key-here
 ```
 
-### Required files:
-
-* `data/TN Traffic rules.pdf`
+Place source PDFs in `data/raw/` before running ingestion. This project currently ships with:
+- Delhi Motor Vehicles Rules, 1993
+- Central Motor Vehicles Rules, 1989
+- Motor Vehicles Act, 1988
+- Motor Vehicles (Amendment) Act, 2019
+- Delhi Motor Vehicle Taxation Act
 
 ---
 
 ## Usage
 
-### 1. Text Extraction
+Run each step from inside `src/`:
 
+**1. Text extraction** (processes every PDF in `data/raw/`)
 ```bash
-python src/text_extraction.py
+python text_extraction.py
 ```
 
-### 2. Chunking
-
+**2. Chunking** (merges all extracted text into one tagged chunk set)
 ```bash
-python src/chunking.py
+python chunking.py
 ```
 
-### 3. Embedding + FAISS Index Creation
-
+**3. Embedding + FAISS index**
 ```bash
-python src/embedding.py
+python embedding.py
 ```
 
-### 4. CLI Chatbot
-
+**4. BM25 sparse index**
 ```bash
-python src/main.py
+python sparse_retriever.py
 ```
 
-### 5. API (FastAPI)
-
+**5. CLI chatbot**
 ```bash
-uvicorn api.app:app --reload
-# Visit http://localhost:8000/docs
+python main.py
+```
+
+**6. Web interface**
+```bash
+cd ..
+streamlit run api/app.py
+```
+
+**7. Run evaluation**
+```bash
+cd src
+python eval_runner.py
 ```
 
 ---
 
-## Data Requirements
+## Architecture
 
-* Input: A traffic rulebook in `.pdf`
-* Output:
-
-  * `.txt` file with full extracted text
-  * `.json` with clean overlapping chunks
-  * `.idx` FAISS index file
-
----
-
-## Testing
-
-Manual test cases:
-
-* Ask questions from the CLI or Swagger UI
-* Evaluate LLM responses vs. original PDF
-
-(Automated tests can be added using `pytest`.)
-
----
-
-## Configuration
-
-### Chunking:
-
-* `chunk_size = 300`
-* `overlap = 50`
-
-### FAISS:
-
-* `IndexFlatIP` used for vector similarity search
-
-### LLM (Groq):
-
-* Model: `mixtral-8x7b-32768` (default)
-* Temperature: `0.3`
+```
+        PDFs (data/raw/)
+              |
+              v
+      Text Extraction (page-aware, multi-document)
+              |
+              v
+      Chunking (merged, source-tagged)
+              |
+   +----------+----------+
+   v                      v
+Dense Embeddings      BM25 Keyword Index
+(FAISS, MiniLM)
+   +----------+----------+
+              v
+   Hybrid Retrieval (Reciprocal Rank Fusion)
+              |
+   +----------+---------------+
+   |  Matches fine lookup?     |--Yes--> Instant, guaranteed answer
+   +----------+----------------+
+             No
+              v
+    LLM Generation (Groq)
+    -- grounded, cited, disclaimer-appended
+```
 
 ---
 
-## Methodology
+## Key Design Decisions
 
-1. Parse legal traffic PDF to text
-2. Split text into semantic chunks
-3. Embed chunks using `sentence-transformers`
-4. Store in `FAISS` for fast vector search
-5. On query:
+**Hybrid retrieval over pure vector search.** Dense embeddings capture semantic meaning but can under-rank chunks that share little vocabulary with the query — an issue confirmed directly during development (see below). BM25 keyword search complements this by catching exact term matches (section numbers, rupee amounts) that embeddings alone can miss.
 
-   * Embed the question
-   * Retrieve top-k relevant chunks
-   * Pass to Groq LLM using LangChain
-6. Return clean, structured answer
+**Structured fine lookup as a targeted mitigation.** For a small set of high-frequency violation queries, retrieval-based generation can be sensitive to exact query phrasing. A deterministic keyword-matched lookup table guarantees consistent, correct answers for these known cases, while everything else falls through to the full RAG pipeline.
+
+**Faithfulness-first prompting.** The system is explicitly instructed to answer only from retrieved context and to decline rather than speculate when information isn't present — verified through direct, repeated testing rather than assumed.
+
+---
+
+## Evaluation
+
+An automated evaluation harness (`eval_runner.py`) scores the system against a 10-question hand-curated test set — covering known fines, general RAG lookups, Hindi queries, and off-topic rejection — using an LLM judge to score each answer 1-5 on:
+
+- **Faithfulness** — does the answer use only facts present in the retrieved context (not the judge's general knowledge)?
+- **Relevance** — does the answer address the question actually asked?
+- **Correctness** — does the answer align with a verified reference answer?
+
+**Latest results:**
+
+| Metric | Score |
+|---|---|
+| Faithfulness | 4.60 / 5 |
+| Relevance | 5.00 / 5 |
+| Correctness | 4.60 / 5 |
+
+The judge is given the actual retrieved context alongside each answer, so faithfulness measures groundedness to retrieval specifically — an earlier version of this harness incorrectly scored faithfulness against the judge's general knowledge instead, which was identified and corrected during development.
+
+Results are saved incrementally to `eval/eval_results.json` after every question, so a crash or rate limit mid-run doesn't discard prior results.
 
 ---
 
 ## Performance
 
-* Fast local retrieval (\~50–100 ms)
-* Groq LLM response: \~100 tokens/ms
-* Accurate context-based answers
-* No hallucinations (guardrails in prompt)
+| Path | Typical latency |
+|---|---|
+| Structured fine lookup | ~0.00s |
+| Hybrid retrieval | 0.04s - 0.25s |
+| LLM generation | 1.0s - 9.8s |
+| Total (full RAG path) | 1.3s - 9.9s |
+
+Retrieval is consistently fast; response time is dominated by LLM generation.
 
 ---
 
-## License
+## Configuration
 
-MIT License. See `LICENSE` file.
+**Chunking:** fixed character-size chunks with overlap, tagged by source document, globally unique chunk IDs across all documents.
 
----
+**Dense retrieval:** `all-MiniLM-L6-v2` embeddings, FAISS `IndexFlatIP` (cosine similarity via L2-normalized vectors).
 
-## Contributing
+**Sparse retrieval:** BM25 over tokenized chunk text (Unicode-aware, supports Hindi).
 
-Pull requests welcome!
+**Fusion:** Reciprocal Rank Fusion, `k=60`.
 
-* Fork the repo
-* Create a new branch
-* Submit a pull request with a meaningful message
+**LLM (Groq):** `openai/gpt-oss-20b`, temperature `0.3`.
 
 ---
 
-## Changelog
+## Known Limitations
 
-### v1.0.0 (June 2025)
-
-* Initial public release
-* Added full pipeline: Extraction, Chunking, Embedding, Retrieval, Generation
-* FastAPI API + CLI support
-* Groq + LangChain integration
+- **Cross-referenced penalty clauses can be missed by retrieval.** Some legal sections state a requirement (e.g., wearing protective headgear) while the actual penalty is defined in a separate, generically-worded catch-all clause elsewhere in the same Act. Because the two share little vocabulary, both semantic and keyword retrieval can fail to connect them. Mitigated for known cases via the fine lookup table; not solved generally. A future improvement would be citation-aware retrieval that explicitly follows cross-references between sections.
+- **Evaluation set is intentionally small (10 questions)** — enough to demonstrate methodology and catch real regressions during development, not yet large enough to be statistically rigorous.
+- **Fine lookup table is manually curated** and should be cross-verified against official legal text before being relied on for real-world use.
+- **Chunking is fixed-size**, not section-boundary-aware — a more sophisticated chunker would respect the natural structure of legal documents.
 
 ---
 
-## Citation
+## Project Notes
 
-If you use this in academic work:
+This system was built and iterated through real debugging cycles, including:
 
-```
-@misc{trafficassistant2025,
-  title={Tamil Nadu Traffic Rules Assistant using RAG},
-  author={Madhan S},
-  year={2025},
-  howpublished={\url{https://github.com/madhans476/traffic_rules_assistant}}
-}
-```
+- A query-vector normalization mismatch between index-build time and query time, which skewed retrieval rankings until identified and fixed.
+- A specific test case — "what is the penalty for not wearing a helmet" — revealed that the Delhi Motor Vehicles Rules state the *requirement* in one section while the Motor Vehicles Act defines the *penalty* in a completely separate, generically-worded section. This directly motivated the hybrid retrieval architecture and the structured fine lookup table.
+- An initial evaluation harness measured "faithfulness" against the judge model's general knowledge rather than the system's actual retrieved context — a subtle but important conceptual error in RAG evaluation, corrected by passing retrieved context directly into the judge prompt.
+
+---
+
+## License / Disclaimer
+
+This project is for educational and portfolio purposes. Information provided by the assistant is based on publicly available legal documents and is not a substitute for professional legal advice. For specific legal matters, consult a qualified legal professional or the concerned traffic authority.
 
 ---
 
 ## Contact
 
-**Maintainer:** Madhan S
-- **Email:** [mail](mailto:22bds036@iiitdwd.ac.in)
-- **GitHub:** [@madhans476](https://github.com/madhans476)
-- **LinkedIn** [@madhans17](https://www.linkedin.com/in/madhan-s17/)
+**Maintainer:** _[Daksh Bains]_
+- **Email:** _[dakshbains05@gmail.com]_
+- **GitHub:** [@daksh8135](https://github.com/daksh8135)
