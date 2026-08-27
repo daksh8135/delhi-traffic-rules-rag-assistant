@@ -2,7 +2,7 @@
 
 An AI-powered assistant built using hybrid Retrieval-Augmented Generation (RAG) that provides context-aware, cited answers about Delhi traffic rules, penalties, and driver rights. It combines dense semantic search with sparse keyword search and LLM generation for accurate, explainable, and trustworthy responses — with built-in evaluation to measure that trustworthiness, not just claim it.
 
-**Live demo:** _[https://delhi-traffic-rules-rag-assistant-dbwuaqjm4arqjhnflatyk9.streamlit.app/]_
+**Live demo:** _[https://delhi-traffic-rules-rag-assistant-az2xuxyzdbz633bga2vxa2.streamlit.app/]_
 
 ---
 
@@ -262,4 +262,4 @@ This project is for educational and portfolio purposes. Information provided by 
 **Maintainer:** _[Daksh Bains]_
 - **Email:** _[dakshbains05@gmail.com]_
 - **GitHub:** [@daksh8135](https://github.com/daksh8135)
-**Live demo:** [https://delhi-traffic-rules-rag-assistant-dbwuaqjm4arqjhnflatyk9.streamlit.app/](https://delhi-traffic-rules-rag-assistant-dbwuaqjm4arqjhnflatyk9.streamlit.app/)
+**Live demo:** [https://delhi-traffic-rules-rag-assistant-az2xuxyzdbz633bga2vxa2.streamlit.app/](https://delhi-traffic-rules-rag-assistant-az2xuxyzdbz633bga2vxa2.streamlit.app/)
