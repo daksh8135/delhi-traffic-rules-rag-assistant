@@ -22,7 +22,7 @@ if query and ask_clicked:
             st.markdown("### Answer")
             st.success(result["answer"])
         except requests.exceptions.ConnectionError:
-            st.error("Can't reach the backend. Make sure the FastAPI server is running (uvicorn api.app:app --reload).")
+            st.error("Can't reach the backend. Make sure the FastAPI server is running (uvicorn api.backend:app --reload).")
         except Exception as e:
             st.error(f"Something went wrong: {e}")
 
