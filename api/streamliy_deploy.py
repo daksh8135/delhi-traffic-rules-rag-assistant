@@ -52,7 +52,7 @@ example_cols = st.columns(3)
 examples = [
     "Fine for not wearing a helmet?",
     "Penalty for drunk driving?",
-    "सड़क पार करते समय सावधानियां?"
+    "सड़क पार करते समय क्या सावधानियां बरतनी चाहिए?"
 ]
 
 if "query_input" not in st.session_state:
