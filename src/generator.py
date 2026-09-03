@@ -18,9 +18,9 @@ SOURCE_NAMES = {
     "the_delhi_motor_vehicle_taxation_act-r.txt": "Delhi Motor Vehicle Taxation Act",
     "aA1988-59.txt": "Motor Vehicles (Amendment) Act, 2019",
     "mact.txt": "Motor Vehicles Act (Supplementary)",
+    "Mvact2019.txt": "Motor Vehicles (Amendment) Act, 2019",
     # add more entries here if you add more source PDFs later
 }
-
 
 def clean_source_name(raw_filename: str) -> str:
     """Converts a raw source filename into a readable document name for citations."""
@@ -45,7 +45,7 @@ class Generator:
 
         self.llm = ChatGroq(
             model=model_name,
-            temperature=0.3,
+            temperature=0.2,
             groq_api_key=os.getenv("GROQ_API_KEY")
         )
 
