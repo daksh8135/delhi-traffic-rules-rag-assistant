@@ -27,7 +27,6 @@ def extract_all_pdfs(raw_dir: str, output_dir: str) -> None:
     """
     Loops over every PDF in raw_dir and saves each one's extracted text
     as its own .txt file in output_dir, named after the PDF.
-    This is what lets you add more PDFs later without touching this file.
     """
     os.makedirs(output_dir, exist_ok=True)
     pdf_files = [f for f in os.listdir(raw_dir) if f.lower().endswith(".pdf")]

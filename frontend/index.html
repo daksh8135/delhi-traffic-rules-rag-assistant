@@ -1,73 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tamil Nadu Traffic Rules Assistant</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚦 Delhi Traffic Rules Assistant</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚦</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Marked.js for markdown rendering & DOMPurify for security -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+
+  <!-- Separate External CSS -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div class="chat-app">
-        <div class="header">
-            <div class="header-content">
-                <div class="traffic-icon">🚦</div>
-                <div class="header-text">
-                    <h1>Tamil Nadu Traffic Assistant</h1>
-                    <p>Your AI-powered guide to traffic rules, fines & road safety</p>
-                </div>
-            </div>
-            <div class="status-indicator" id="statusIndicator">
-                <div class="status-dot" id="statusDot"></div>
-                <div class="status-text" id="statusText">Connecting...</div>
-            </div>
+  <div class="app-container">
+    <!-- Top Bar with Header & Settings Button -->
+    <header class="header">
+      <div class="header-content">
+        <div class="title-section">
+          <div class="icon-bubble">🚦</div>
+          <div>
+            <h1>Delhi Traffic Rules Assistant</h1>
+            <p class="subtitle">Ask questions about Delhi traffic rules, fines, and procedures. Supports <strong>English</strong> and <strong>हिन्दी (Hindi)</strong>.</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="settingsBtn" class="icon-btn" title="API Settings" aria-label="Backend Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-card">
+      <div class="input-group">
+        <label for="queryInput" class="input-label">Your question:</label>
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="queryInput" 
+            placeholder="e.g. What is the fine for not wearing a helmet?" 
+            autocomplete="off"
+            autofocus
+          />
+          <button id="askBtn" class="btn btn-primary" type="button">
+            <span>Ask</span>
+            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Suggested Questions -->
+      <div class="suggestions-container">
+        <span class="suggestions-label">Try asking:</span>
+        <div class="chips-list">
+          <button class="chip" data-question="What is the fine for not wearing a helmet?">🪖 Helmet fine</button>
+          <button class="chip" data-question="What is the penalty for jumping a red light in Delhi?">🛑 Red light violation</button>
+          <button class="chip" data-question="Can traffic police seize my vehicle for drunken driving?">🍷 Drunken driving rules</button>
+          <button class="chip" data-question="बिना प्रदूषण प्रमाणपत्र (PUC) गाड़ी चलाने पर कितना चालान है?">📄 PUC चालान (Hindi)</button>
+        </div>
+      </div>
+
+      <!-- Advanced Options (Collapsible) -->
+      <details class="advanced-toggle">
+        <summary>Advanced Options (top_k retrieval)</summary>
+        <div class="advanced-content">
+          <label for="topKInput">Top K chunks to retrieve:</label>
+          <input type="number" id="topKInput" value="10" min="1" max="50" step="1">
+        </div>
+      </details>
+
+      <!-- Spinner / Loading State -->
+      <div id="loadingIndicator" class="loading-state hidden">
+        <div class="spinner"></div>
+        <div class="loading-text">
+          <span class="pulsing-text">Thinking...</span>
+          <span class="loading-subtext">Searching Delhi Traffic regulations and generating response</span>
+        </div>
+      </div>
+
+      <!-- Error Banner -->
+      <div id="errorBanner" class="alert alert-error hidden">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+          <h4 id="errorTitle">Something went wrong</h4>
+          <p id="errorMessage"></p>
+          <div id="corsTip" class="error-tip hidden">
+            💡 <strong>Backend unreachable:</strong> Make sure your FastAPI server is running:
+            <code>uvicorn api.app:app --reload</code>
+            <br>
+            If running on Vercel, click the ⚙️ Settings button to set your live FastAPI server URL.
+          </div>
+        </div>
+      </div>
+
+      <!-- Answer Section -->
+      <section id="answerSection" class="answer-section hidden">
+        <div class="answer-header">
+          <h3>Answer</h3>
+          <button id="copyBtn" class="copy-btn" title="Copy answer to clipboard">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="copyBtnText">Copy</span>
+          </button>
         </div>
 
-        <div class="chat-container scrollbar-custom" id="chatContainer">
-            <div class="welcome-card">
-                <h2>🚗 Welcome to Your Traffic Assistant!</h2>
-                <p>I'm here to help you understand Tamil Nadu traffic rules, penalties, license procedures, and road safety guidelines. Ask me anything!</p>
-                
-                <div class="sample-questions">
-                    <div class="sample-question" onclick="askSampleQuestion('What is the fine amount for not wearing a helmet?')">
-                        💰 What is the fine amount for not wearing a helmet?
-                    </div>
-                    <div class="sample-question" onclick="askSampleQuestion('How to apply for a driving license?')">
-                        📄 How to apply for a driving license?
-                    </div>
-                    <div class="sample-question" onclick="askSampleQuestion('What are the speed limits in Tamil Nadu?')">
-                        🏃 What are the speed limits in Tamil Nadu?
-                    </div>
-                    <div class="sample-question" onclick="askSampleQuestion('Tax rates')">
-                        🚫 Tax rates
-                    </div>
-                </div>
-            </div>
+        <div class="answer-box">
+          <div id="answerText" class="markdown-body"></div>
         </div>
 
-        <div class="typing-indicator" id="typingIndicator">
-            <div class="typing-dots">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-            </div>
-        </div>
+        <!-- Retrieved Context Accordion (Returned by FastAPI context field) -->
+        <details id="contextAccordion" class="context-details hidden">
+          <summary>📚 View Retrieved Context / Source Documents</summary>
+          <div class="context-box">
+            <pre id="contextText"></pre>
+          </div>
+        </details>
+      </section>
+    </main>
 
-        <div class="input-container">
-            <div class="input-wrapper">
-                <div class="input-field">
-                    <textarea 
-                        id="queryInput" 
-                        placeholder="Ask me about traffic rules, fines, procedures..."
-                        rows="1"
-                    ></textarea>
-                </div>
-                <button id="askButton" title="Send message">
-                    ➤
-                </button>
-            </div>
-        </div>
+    <!-- Footer -->
+    <footer class="footer">
+      <hr class="divider">
+      <p class="caption">
+        Built with LangChain, FAISS, BM25 hybrid retrieval, Groq, FastAPI, and deployed on Vercel.
+      </p>
+    </footer>
+  </div>
+
+  <!-- Settings Modal for API URL Configuration -->
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>FastAPI Connection Settings</h3>
+        <button id="closeSettingsModal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label for="apiUrlInput" class="modal-label">FastAPI Backend URL:</label>
+        <input 
+          type="url" 
+          id="apiUrlInput" 
+          placeholder="http://127.0.0.1:8000" 
+          spellcheck="false"
+        />
+        <p class="help-text">
+          - For local testing: <code>http://127.0.0.1:8000</code><br>
+          - For cloud deployment: <code>https://your-api.onrender.com</code> or ngrok URL.
+        </p>
+
+        <div class="modal-status" id="testConnectionStatus"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="testConnectionBtn" class="btn btn-secondary">Test Connection</button>
+        <button id="saveSettingsBtn" class="btn btn-primary">Save & Close</button>
+      </div>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <!-- Separate External JavaScript -->
+  <script src="./app.js"></script>
 </body>
 </html>

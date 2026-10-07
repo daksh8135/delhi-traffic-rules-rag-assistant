@@ -1,30 +1,60 @@
-# frontend_app.py
+# api/app.py
 
-import streamlit as st
-import requests
+import sys
+import os
 
-API_URL = "http://127.0.0.1:8000"
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
 
-st.set_page_config(page_title="Delhi Traffic Rules Assistant", page_icon="🚦")
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+from generator import Generator
 
-st.title("🚦 Delhi Traffic Rules Assistant")
-st.write("Ask questions about Delhi traffic rules, fines, and procedures. Supports English and Hindi.")
+app = FastAPI(
+    title="Delhi Traffic Rules RAG API",
+    description="Hybrid RAG backend for Delhi traffic law queries.",
+    version="3.0.0"
+)
 
-query = st.text_input("Your question:", placeholder="e.g. What is the fine for not wearing a helmet?")
-ask_clicked = st.button("Ask", type="primary")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-if query and ask_clicked:
-    with st.spinner("Thinking..."):
-        try:
-            response = requests.post(f"{API_URL}/ask", json={"query": query, "top_k": 10})
-            response.raise_for_status()
-            result = response.json()
-            st.markdown("### Answer")
-            st.success(result["answer"])
-        except requests.exceptions.ConnectionError:
-            st.error("Can't reach the backend. Make sure the FastAPI server is running (uvicorn api.backend:app --reload).")
-        except Exception as e:
-            st.error(f"Something went wrong: {e}")
+generator = Generator()
 
-st.divider()
-st.caption("Built with LangChain, FAISS, BM25 hybrid retrieval, Groq, FastAPI, and Streamlit.")
+
+class QueryRequest(BaseModel):
+    query: str = Field(..., description="User query in English or Hindi")
+    top_k: int = Field(default=10, description="Top K retrieval count")
+
+
+class QueryResponse(BaseModel):
+    answer: str
+    context: str = ""
+
+
+@app.get("/")
+def read_root():
+    return {"message": "Delhi Traffic Rules RAG API is running."}
+
+
+@app.post("/ask", response_model=QueryResponse)
+def ask_question(request: QueryRequest):
+    query = request.query.strip()
+    if not query:
+        raise HTTPException(status_code=400, detail="Query cannot be empty.")
+
+    try:
+        result = generator.ask(query, top_k=request.top_k)
+        
+        # Safely extract answer and context
+        answer = result.get("answer", "") if isinstance(result, dict) else str(result)
+        context = result.get("context", "") if isinstance(result, dict) else ""
+        
+        return {"answer": answer, "context": context}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Generation error: {str(e)}")
