@@ -13,3 +13,4 @@ langchain-groq
 groq
 streamlit
 requests
+pinecone
