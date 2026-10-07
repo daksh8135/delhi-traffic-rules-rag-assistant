@@ -9,9 +9,15 @@ from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone
 from fine_lookup import FineLookup
 
+# Optional: Langfuse Callback for Tracing (Feature 3)
+try:
+    from langfuse.callback import CallbackHandler
+    LANGFUSE_AVAILABLE = True
+except ImportError:
+    LANGFUSE_AVAILABLE = False
+
 load_dotenv()
 
-# Maps raw filenames to clean, human-readable document names for citations
 SOURCE_NAMES = {
     "delhi_traffic_rules.txt": "Delhi Motor Vehicles Rules, 1993",
     "cmvr1989.txt": "Central Motor Vehicles Rules, 1989",
@@ -30,14 +36,14 @@ class Generator:
     def __init__(self, model_name: str = "openai/gpt-oss-20b"):
         BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-        # 1. Connect to Pinecone Cloud
+        # 1. Pinecone Cloud Index
         pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
         self.pinecone_index = pc.Index("delhi-traffic-rules")
 
-        # 2. Multilingual embedding model for incoming questions
+        # 2. Embedding Model for Queries
         self.embed_model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
 
-        # 3. Lookup table for high-frequency fine questions
+        # 3. Lookup table for frequent fine questions
         self.fine_lookup = FineLookup(os.path.join(BASE_DIR, "data", "fines_lookup.json"))
 
         # 4. Groq LLM
@@ -47,78 +53,112 @@ class Generator:
             groq_api_key=os.getenv("GROQ_API_KEY")
         )
 
+        # 5. Langfuse Tracing Handler (Feature 3)
+        self.langfuse_handler = None
+        if LANGFUSE_AVAILABLE and os.getenv("LANGFUSE_PUBLIC_KEY"):
+            try:
+                self.langfuse_handler = CallbackHandler(
+                    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+                    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+                    host=os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
+                )
+            except Exception as e:
+                print(f"[Warning] Langfuse initialization skipped: {e}")
+
     def retrieve_chunks(self, query: str, top_k: int = 10):
-        """Encodes query and retrieves top_k chunks from Pinecone."""
+        """Encodes query and retrieves top_k chunks from Pinecone with similarity scores."""
         query_vector = self.embed_model.encode(query).tolist()
         results = self.pinecone_index.query(
             vector=query_vector,
             top_k=top_k,
             include_metadata=True
         )
-        return [match["metadata"] for match in results["matches"]]
+
+        scored_chunks = []
+        for match in results["matches"]:
+            metadata = match.get("metadata", {})
+            text = metadata.get("text", "")
+            scored_chunks.append({
+                "id": match["id"],
+                "score": round(match["score"], 4),  # Cosine similarity (0.0 to 1.0)
+                "source": clean_source_name(metadata.get("source", "Unknown")),
+                "snippet": (text[:160] + "...") if len(text) > 160 else text,
+                "text": text
+            })
+        return scored_chunks
 
     def ask(self, query: str, top_k: int = 10) -> dict:
         start_time = time.time()
 
-        # STEP 1: Quick lookup first
+        # Step 1: Quick lookup first
         quick_answer = self.fine_lookup.match(query)
         if quick_answer:
             elapsed = time.time() - start_time
-            print(f"[Performance] Lookup match — total time: {elapsed:.2f}s")
             return {
                 "answer": quick_answer,
-                "context": "Structured fine lookup table (no retrieval used)"
+                "context": "Structured fine lookup table (no retrieval used)",
+                "metrics": {
+                    "total_latency_ms": round(elapsed * 1000, 2),
+                    "retrieval_latency_ms": 0.0,
+                    "llm_latency_ms": 0.0,
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "total_tokens": 0,
+                    "estimated_cost_usd": 0.0,
+                    "retrieved_chunks": []
+                }
             }
 
-        # STEP 2: Query Pinecone Cloud
+        # Step 2: Query Pinecone (Feature 1: Latency & Similarity Scores)
         retrieval_start = time.time()
-        relevant_chunks = self.retrieve_chunks(query, top_k)
+        scored_chunks = self.retrieve_chunks(query, top_k)
         retrieval_time = time.time() - retrieval_start
 
         context = "\n\n".join(
-            [f"[Source: {clean_source_name(chunk.get('source', ''))}] {chunk['text']}" for chunk in relevant_chunks]
+            [f"[Source: {c['source']}] {c['text']}" for c in scored_chunks]
         )
 
         messages = [
             SystemMessage(
                 content=(
-                    "You are a traffic law assistant trained on multiple Delhi traffic law documents "
-                    "(e.g. Delhi Motor Vehicles Rules, Motor Vehicles Act). "
-                    "Your task is to answer user questions by using only the information provided in the context. "
-                    "Do not generate answers based on external knowledge or assumptions.\n\n"
-                    "If the context does not contain enough information to answer the question accurately, "
-                    "politely inform the user that the answer is not available and suggest they rephrase or ask something else. "
-                    "Do not mention 'context provided' or similar phrases in the answer. Do not speculate.\n\n"
-                    "Multiple source documents may appear in the context, each labeled [Source: document name]. "
-                    "ALWAYS cite the exact source document name shown in the context — never invent a name and "
-                    "never show a raw filename. "
-                    "If different documents cover different parts of the answer, mention both sources explicitly.\n\n"
-                    "Give clear, factual, and concise answers with specific penalties, fines (₹), or legal terms.\n\n"
-                    "DISCLAIMER: End every answer with this exact line on its own:\n"
-                    "\"Note: This information is for general awareness only. For specific legal matters, please consult a qualified legal professional or the concerned traffic authority.\""
+                    "You are a traffic law assistant trained on Delhi traffic law documents. "
+                    "Answer user questions accurately using ONLY the information provided in the context.\n"
+                    "Cite the exact document names when applicable and include specific fines (₹).\n\n"
+                    "End with: \"Note: This information is for general awareness only. For specific legal matters, please consult a qualified legal professional or the concerned traffic authority.\""
                 )
             ),
-            HumanMessage(
-                content=f"Context:\n{context}\n\nQuestion: {query}"
-            )
+            HumanMessage(content=f"Context:\n{context}\n\nQuestion: {query}")
         ]
 
+        # Step 3: LLM Inference with optional Langfuse tracing (Feature 3)
         llm_start = time.time()
-        response = self.llm.invoke(messages)
+        callbacks = [self.langfuse_handler] if self.langfuse_handler else []
+        response = self.llm.invoke(messages, config={"callbacks": callbacks} if callbacks else None)
         llm_time = time.time() - llm_start
-
         total_time = time.time() - start_time
-        print(f"[Performance] Pinecone: {retrieval_time:.2f}s | LLM: {llm_time:.2f}s | Total: {total_time:.2f}s")
+
+        # Step 4: Token usage and cost calculation
+        token_usage = response.response_metadata.get("token_usage", {})
+        prompt_tokens = token_usage.get("prompt_tokens", 0)
+        completion_tokens = token_usage.get("completion_tokens", 0)
+        total_tokens = token_usage.get("total_tokens", prompt_tokens + completion_tokens)
+
+        # Groq LLaMA pricing: ~$0.59 / 1M prompt tokens, $0.79 / 1M completion tokens
+        cost_usd = (prompt_tokens * 0.00000059) + (completion_tokens * 0.00000079)
+
+        metrics = {
+            "total_latency_ms": round(total_time * 1000, 2),
+            "retrieval_latency_ms": round(retrieval_time * 1000, 2),
+            "llm_latency_ms": round(llm_time * 1000, 2),
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "estimated_cost_usd": round(cost_usd, 6),
+            "retrieved_chunks": scored_chunks
+        }
 
         return {
             "answer": response.content,
-            "context": context
+            "context": context,
+            "metrics": metrics
         }
-
-
-if __name__ == "__main__":
-    generator = Generator()
-    query = "What are the rules for under age driving?"
-    result = generator.ask(query, top_k=10)
-    print("\nAnswer:\n")
-    print(result["answer"])

@@ -23,6 +23,16 @@ const contextText = document.getElementById("contextText");
 const copyBtn = document.getElementById("copyBtn");
 const copyBtnText = document.getElementById("copyBtnText");
 
+// Observability Telemetry DOM Elements
+const telemetrySection = document.getElementById("telemetrySection");
+const metricTotalLatency = document.getElementById("metricTotalLatency");
+const metricRetrievalLatency = document.getElementById("metricRetrievalLatency");
+const metricLlmLatency = document.getElementById("metricLlmLatency");
+const metricTokens = document.getElementById("metricTokens");
+const metricCost = document.getElementById("metricCost");
+const chunkCount = document.getElementById("chunkCount");
+const chunksContainer = document.getElementById("chunksContainer");
+
 // Settings Modal Elements
 const settingsBtn = document.getElementById("settingsBtn");
 const settingsModal = document.getElementById("settingsModal");
@@ -127,8 +137,9 @@ async function handleAsk() {
     // Extract answer (handles {"answer": ...} or {"response": ...})
     const answer = result.answer || result.response || (typeof result === "string" ? result : JSON.stringify(result));
     const context = result.context || "";
+    const metrics = result.metrics || null;
 
-    renderAnswer(answer, context);
+    renderAnswer(answer, context, metrics);
   } catch (err) {
     console.error("Query Error:", err);
     handleError(err);
@@ -138,7 +149,7 @@ async function handleAsk() {
 }
 
 // Render answer
-function renderAnswer(answer, context = "") {
+function renderAnswer(answer, context = "", metrics = null) {
   currentAnswerRaw = answer;
 
   let formattedHtml = answer;
@@ -149,6 +160,38 @@ function renderAnswer(answer, context = "") {
   }
 
   answerText.innerHTML = formattedHtml;
+
+  // Feature 2: Telemetry Metrics Display
+  if (metrics) {
+    metricTotalLatency.textContent = `${Math.round(metrics.total_latency_ms || 0)} ms`;
+    metricRetrievalLatency.textContent = `${Math.round(metrics.retrieval_latency_ms || 0)} ms`;
+    metricLlmLatency.textContent = `${Math.round(metrics.llm_latency_ms || 0)} ms`;
+    metricTokens.textContent = `${metrics.total_tokens || 0} (${metrics.prompt_tokens || 0} in / ${metrics.completion_tokens || 0} out)`;
+    metricCost.textContent = `$${(metrics.estimated_cost_usd || 0).toFixed(5)}`;
+
+    const chunks = metrics.retrieved_chunks || [];
+    chunkCount.textContent = chunks.length;
+    chunksContainer.innerHTML = "";
+
+    chunks.forEach((c, idx) => {
+      const scorePct = Math.round((c.score || 0) * 100);
+      const scoreClass = scorePct >= 75 ? "score-high" : "score-med";
+      const item = document.createElement("div");
+      item.className = "chunk-item";
+      item.innerHTML = `
+        <div class="chunk-meta">
+          <span class="chunk-source">#${idx + 1} 📄 ${escapeHtml(c.source || 'Traffic Regulation')}</span>
+          <span class="chunk-score ${scoreClass}">Score: ${(c.score || 0).toFixed(4)} (${scorePct}%)</span>
+        </div>
+        <p class="chunk-snippet">${escapeHtml(c.snippet || c.text || '')}</p>
+      `;
+      chunksContainer.appendChild(item);
+    });
+
+    telemetrySection.classList.remove("hidden");
+  } else {
+    telemetrySection.classList.add("hidden");
+  }
 
   // Handle retrieved context if returned by FastAPI
   if (context && context.trim()) {
@@ -207,6 +250,8 @@ function hideAnswer() {
   currentAnswerRaw = "";
   contextAccordion.classList.add("hidden");
   contextText.textContent = "";
+  telemetrySection.classList.add("hidden");
+  chunksContainer.innerHTML = "";
 }
 
 // Copy to clipboard

@@ -15,6 +15,13 @@
 
   <!-- Separate External CSS -->
   <link rel="stylesheet" href="./style.css">
+
+  <style>
+    /* Critical Display Utility: guarantees hidden modals, loaders, and alerts stay hidden */
+    .hidden {
+      display: none !important;
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
@@ -122,9 +129,49 @@
           <div id="answerText" class="markdown-body"></div>
         </div>
 
-        <!-- Retrieved Context Accordion (Returned by FastAPI context field) -->
+        <!-- Feature 2: Pipeline Observability & Telemetry Inspector -->
+        <div id="telemetrySection" class="telemetry-card hidden">
+          <div class="telemetry-header">
+            <div class="telemetry-title">
+              <span class="telemetry-icon">⚡</span>
+              <h4>Production Observability & Tracing</h4>
+            </div>
+            <span class="telemetry-tag">Live Telemetry</span>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <span class="metric-label">⏱️ Total Latency</span>
+              <span class="metric-value" id="metricTotalLatency">0 ms</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">🔍 Pinecone Vector Search</span>
+              <span class="metric-value" id="metricRetrievalLatency">0 ms</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">🤖 Groq LLM Latency</span>
+              <span class="metric-value" id="metricLlmLatency">0 ms</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">🎟️ Token Usage</span>
+              <span class="metric-value" id="metricTokens">0 tokens</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">💰 Query Cost</span>
+              <span class="metric-value" id="metricCost">$0.00000</span>
+            </div>
+          </div>
+
+          <!-- Retrieved Chunks with Similarity Scores -->
+          <details id="chunksDetails" class="chunks-accordion">
+            <summary>🎯 Inspect Chunks & Cosine Similarity Scores (<span id="chunkCount">0</span> chunks)</summary>
+            <div id="chunksContainer" class="chunks-container"></div>
+          </details>
+        </div>
+
+        <!-- Retrieved Raw Context Accordion -->
         <details id="contextAccordion" class="context-details hidden">
-          <summary>📚 View Retrieved Context / Source Documents</summary>
+          <summary>📚 View Full Context Sent to LLM</summary>
           <div class="context-box">
             <pre id="contextText"></pre>
           </div>
