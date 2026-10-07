@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "query": "What is the fine for not wearing a helmet in Delhi?",
+    "expected_answer_keywords": ["1000", "helmet", "129", "section"],
+    "relevant_sources": ["Delhi Motor Vehicles Rules, 1993", "Motor Vehicles Act, 1988"],
+    "ground_truth": "Under Section 129 of the Motor Vehicles Act, 1988, it is mandatory for every person riding a two-wheeler to wear a protective helmet. The fine for not wearing a helmet in Delhi is ₹1,000 and/or disqualification of driving licence for 3 months."
+  },
+  {
+    "id": 2,
+    "query": "What is the penalty for jumping a red light in Delhi?",
+    "expected_answer_keywords": ["1000", "5000", "red light", "signal", "traffic"],
+    "relevant_sources": ["Motor Vehicles Act, 1988", "Motor Vehicles (Amendment) Act, 2019"],
+    "ground_truth": "Jumping a red light in Delhi attracts a fine of ₹1,000 for the first offence and ₹5,000 for subsequent offences under the Motor Vehicles (Amendment) Act, 2019."
+  },
+  {
+    "id": 3,
+    "query": "Can traffic police seize my vehicle for drunken driving in Delhi?",
+    "expected_answer_keywords": ["alcohol", "185", "6 months", "10000", "seize", "impound"],
+    "relevant_sources": ["Motor Vehicles Act, 1988", "Motor Vehicles (Amendment) Act, 2019"],
+    "ground_truth": "Yes. Under Section 185 of the Motor Vehicles Act, driving under the influence of alcohol or drugs is a cognizable offence. The penalty includes imprisonment up to 6 months and/or a fine of ₹10,000 for the first offence. The vehicle can be seized."
+  },
+  {
+    "id": 4,
+    "query": "What is the fine for driving without a valid driving licence in Delhi?",
+    "expected_answer_keywords": ["5000", "licence", "181", "without"],
+    "relevant_sources": ["Motor Vehicles Act, 1988", "Motor Vehicles (Amendment) Act, 2019"],
+    "ground_truth": "Driving without a valid driving licence attracts a fine of ₹5,000 under Section 181 of the Motor Vehicles Act, 1988."
+  },
+  {
+    "id": 5,
+    "query": "What is the penalty for using a mobile phone while driving in Delhi?",
+    "expected_answer_keywords": ["5000", "mobile", "phone", "handheld", "distraction"],
+    "relevant_sources": ["Motor Vehicles Act, 1988", "Motor Vehicles (Amendment) Act, 2019"],
+    "ground_truth": "Using a mobile phone while driving attracts a fine of ₹5,000 under the Motor Vehicles (Amendment) Act, 2019. This is treated as a dangerous driving offence."
+  },
+  {
+    "id": 6,
+    "query": "What is the fine for not wearing a seatbelt in Delhi?",
+    "expected_answer_keywords": ["1000", "seatbelt", "seat belt", "138"],
+    "relevant_sources": ["Motor Vehicles Act, 1988", "Central Motor Vehicles Rules, 1989"],
+    "ground_truth": "Not wearing a seatbelt attracts a fine of ₹1,000 under the Motor Vehicles Act. Rule 138 of Central Motor Vehicles Rules, 1989 makes it mandatory for the driver and all passengers to wear seat belts."
+  },
+  {
+    "id": 7,
+    "query": "बिना प्रदूषण प्रमाणपत्र (PUC) के वाहन चलाने पर कितना जुर्माना है?",
+    "expected_answer_keywords": ["10000", "10,000", "PUC", "प्रदूषण", "pollution"],
+    "relevant_sources": ["Motor Vehicles Act, 1988", "Central Motor Vehicles Rules, 1989"],
+    "ground_truth": "बिना वैध प्रदूषण नियंत्रण प्रमाणपत्र (PUC) के वाहन चलाने पर ₹10,000 का जुर्माना और/या 6 महीने की कैद हो सकती है।"
+  },
+  {
+    "id": 8,
+    "query": "What are the rules for overtaking on Delhi roads?",
+    "expected_answer_keywords": ["overtake", "right", "left", "signal", "safe"],
+    "relevant_sources": ["Central Motor Vehicles Rules, 1989", "Delhi Motor Vehicles Rules, 1993"],
+    "ground_truth": "Overtaking must be done from the right side only. The driver must give a clear signal before overtaking and ensure the road is clear. Overtaking near pedestrian crossings, intersections, or on blind curves is prohibited."
+  },
+  {
+    "id": 9,
+    "query": "What is the fine for triple riding on a two-wheeler in Delhi?",
+    "expected_answer_keywords": ["triple", "two-wheeler", "1000", "pillion", "passenger"],
+    "relevant_sources": ["Motor Vehicles Act, 1988", "Delhi Motor Vehicles Rules, 1993"],
+    "ground_truth": "Triple riding (more than 2 persons on a two-wheeler) is prohibited and attracts a fine of ₹1,000 under the Motor Vehicles Act."
+  },
+  {
+    "id": 10,
+    "query": "What is the speed limit for vehicles on Delhi expressways?",
+    "expected_answer_keywords": ["speed", "limit", "km/h", "expressway", "highway", "120"],
+    "relevant_sources": ["Central Motor Vehicles Rules, 1989", "Delhi Motor Vehicles Rules, 1993"],
+    "ground_truth": "The speed limit on expressways in Delhi is 120 km/h for cars and 80 km/h for trucks and buses. Exceeding the speed limit attracts heavy fines under the Motor Vehicles Act."
+  }
+]
